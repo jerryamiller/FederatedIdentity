@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Web;
+using System.Web.Helpers;
 using IdentityServer.Configuration;
 using IdentityServer3.Core;
 using IdentityServer3.Core.Configuration;
 using IdentityServer3.Core.Models;
+using Microsoft.Owin.Security.Cookies;
+using Microsoft.Owin.Security.OpenIdConnect;
 using Owin;
 
 namespace IdentityServer
@@ -15,6 +19,9 @@ namespace IdentityServer
     {
         public void Configuration(IAppBuilder app)
         {
+            var clients = IdentityServerSettings.Settings.Clients.Get();
+            var scopes = IdentityServerSettings.Settings.Scopes.Get();
+
             app.Map("/identity", idsrvApp =>
             {
                 idsrvApp.UseIdentityServer(new IdentityServerOptions
@@ -24,10 +31,30 @@ namespace IdentityServer
 
                     Factory = new IdentityServerServiceFactory()
                                 .UseInMemoryUsers(Users.Get())
-                                .UseInMemoryClients(Clients.Get())
-                                .UseInMemoryScopes(StandardScopes.All)
+                                .UseInMemoryClients(clients)
+                                .UseInMemoryScopes(scopes)
                 });
             });
+
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationType = "Cookies"
+            });
+
+            app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
+            {
+                Authority = "https://localhost:44319/identity",
+
+                ClientId = "mvc",
+                Scope = "openid profile roles",
+                RedirectUri = "https://localhost:44319/",
+                ResponseType = "id_token",
+
+                SignInAsAuthenticationType = "Cookies"
+            });
+
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = Constants.ClaimTypes.Subject;
+            JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
         }
 
         X509Certificate2 LoadCertificate()
