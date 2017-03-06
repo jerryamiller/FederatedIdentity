@@ -1,0 +1,2 @@
+﻿https://identityserver.github.io/Documentation/docsv2/overview/mvcGettingStarted.html for setup info
+https://github.com/IdentityServer/IdentityServer3.Samples/tree/master/source/Certificates for info on installing the cert
