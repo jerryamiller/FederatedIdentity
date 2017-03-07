@@ -163,6 +163,7 @@
     <Compile Include="Configuration\IdentityServerSettings.cs" />
     <Compile Include="Configuration\Users.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Extensions\OidcAuthNotificationHandler.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

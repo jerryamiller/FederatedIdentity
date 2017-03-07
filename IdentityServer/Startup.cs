@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens;
-using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using System.Web;
 using System.Web.Helpers;
 using IdentityServer.Configuration;
+using IdentityServer.Extensions;
 using IdentityServer3.Core;
 using IdentityServer3.Core.Configuration;
-using IdentityServer3.Core.Models;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
 using Owin;
@@ -43,14 +41,20 @@ namespace IdentityServer
 
             app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
             {
-                Authority = "https://localhost:44319/identity",
+                Authority = "https://login.windows.net/f5cef574-bdfa-4f0c-a592-ddfe07e8bfbb", // URL + tenant ID
 
-                ClientId = "mvc",
-                Scope = "openid profile roles",
+                ClientId = "d257452d-16e2-4dbb-857f-ffc1881e3705", //Application ID from App on Azure AD
+                Scope = "openid profile email address phone",
                 RedirectUri = "https://localhost:44319/",
                 ResponseType = "id_token",
 
-                SignInAsAuthenticationType = "Cookies"
+                SignInAsAuthenticationType = "Cookies",
+                UseTokenLifetime = false,
+
+                Notifications = new OpenIdConnectAuthenticationNotifications
+                {
+                    SecurityTokenValidated = OidcAuthNotificationHandler.Oidc
+                }
             });
 
             AntiForgeryConfig.UniqueClaimTypeIdentifier = Constants.ClaimTypes.Subject;
